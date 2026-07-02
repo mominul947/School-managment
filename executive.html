@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Executive Committee | Otarhat High School</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 md:p-8">
+
+<main class="max-w-5xl mx-auto">
+  <div class="bg-[#0E2144] p-6 rounded-t-xl">
+    <h1 class="text-white text-2xl font-bold flex items-center gap-2">
+      👥 Executive Committee
+    </h1>
+    <p class="text-blue-200 text-sm mt-1">Meet the current committee members.</p>
+  </div>
+
+  <div id="committee-container" class="space-y-8 mt-6">
+    <!-- ডাটা এখানে লোড হবে -->
+    <p class="text-center text-gray-500">Loading members...</p>
+  </div>
+</main>
+
+<script>
+const firebaseConfig = { /* আপনার কনফিগারেশন */ };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+db.collection("siteContent").doc("executive").onSnapshot((doc) => {
+  const container = document.getElementById('committee-container');
+  container.innerHTML = '';
+  
+  if (doc.exists) {
+    const groups = doc.data().groups; // গ্রুপগুলো (যেমন: President, VP)
+    for (const [title, members] of Object.entries(groups)) {
+      container.innerHTML += `
+        <section>
+          <h2 class="text-xl font-bold text-gray-800 mb-4 border-l-4 border-[#0E2144] pl-3">${title}</h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            ${members.map(m => `
+              <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4">
+                <img src="${m.image || 'https://via.placeholder.com/80'}" class="w-16 h-16 rounded-full object-cover">
+                <div>
+                  <h3 class="font-bold text-gray-900">${m.name}</h3>
+                  <p class="text-xs text-gray-500">Batch: ${m.batch}</p>
+                  <p class="text-sm text-gray-600 mt-1">${m.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }
+  }
+});
+</script>
+</body>
+</html>

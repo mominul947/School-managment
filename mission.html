@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mission & Vision | Otarhat High School</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+  body { font-family: 'Nunito Sans', sans-serif; }
+  .content-area p { margin-bottom: 1rem; line-height: 1.7; }
+</style>
+</head>
+<body class="bg-gray-50">
+
+<main class="max-w-4xl mx-auto px-4 py-12">
+  <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
+    <div class="bg-[#0E2144] p-8">
+      <h1 id="mission-heading" class="text-white text-3xl font-bold">Mission & Vision</h1>
+    </div>
+    
+    <div id="mission-content" class="content-area p-8 text-gray-700">
+      <p>Loading...</p>
+    </div>
+  </div>
+</main>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Firestore থেকে ডাটা ফেচ করা
+db.collection("siteContent").doc("mission").onSnapshot((doc) => {
+  const contentEl = document.getElementById('mission-content');
+  const headingEl = document.getElementById('mission-heading');
+  
+  if (doc.exists) {
+    const data = doc.data();
+    headingEl.textContent = data.title || "Mission & Vision";
+    // টেক্সট এরিয়া থেকে আসা লেখাগুলোকে প্যারাগ্রাফে রূপান্তর
+    contentEl.innerHTML = (data.text || '').replace(/\n/g, '<br>');
+  } else {
+    contentEl.innerHTML = '<p>No content has been added to the Mission & Vision page yet.</p>';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Headmasters | Otarhat High School</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+  body { font-family: 'Nunito Sans', sans-serif; }
+  .table-container { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+  th { background-color: #f1f4f9; }
+</style>
+</head>
+<body class="bg-gray-50">
+
+<main class="max-w-5xl mx-auto px-4 py-8">
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="bg-[#0E2144] p-6">
+      <h1 class="text-white text-2xl font-bold">প্রধান শিক্ষকদের তালিকা</h1>
+      <p class="text-blue-200 text-sm">Otarhat High School</p>
+    </div>
+    
+    <div class="table-container p-6">
+      <table id="headmaster-table">
+        <thead>
+          <tr>
+            <th>ক্র: নং</th>
+            <th>নাম</th>
+            <th>তারিখ (from)</th>
+            <th>তারিখ (to)</th>
+          </tr>
+        </thead>
+        <tbody id="headmaster-body">
+          <!-- Data will be injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ডাটা লোড করার ফাংশন
+db.collection("siteContent").doc("headmasters").onSnapshot((doc) => {
+  const tbody = document.getElementById('headmaster-body');
+  tbody.innerHTML = '';
+  
+  if (doc.exists && doc.data().list) {
+    doc.data().list.forEach((item, index) => {
+      const row = `<tr>
+        <td>${index + 1}</td>
+        <td>${item.name}</td>
+        <td>${item.from}</td>
+        <td>${item.to}</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+  } else {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center">কোন তথ্য পাওয়া যায়নি।</td></tr>';
+  }
+});
+</script>
+</body>
+</html>
