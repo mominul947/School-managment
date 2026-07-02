@@ -192,17 +192,19 @@ tailwind.config = {
 
 <main class="pt-16 md:pt-20" id="home">
 
-  <!-- Hero Section with autoplay looping VIDEO -->
-  <section class="relative h-[60vh] md:h-[80vh] flex items-center overflow-hidden bg-black">
-    <div class="absolute inset-0 z-0">
-      <div class="absolute inset-0 bg-primary/55 z-10"></div>
-  <!-- Hero Section এর ভেতরে এই অংশটি দেখুন -->
-<video id="hero-video" class="w-full h-full object-cover object-center" autoplay muted loop playsinline poster="path/to/your-poster-image.jpg">
-  <source src="school.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-      <img id="hero-fallback-img" alt="Otarhat High School" class="w-full h-full object-cover object-center hidden" src=""/>
-    </div>
+<!-- Hero Section -->
+<section class="relative w-full overflow-hidden bg-black" style="aspect-ratio: 16 / 9;">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-primary/55 z-10"></div>
+    
+    <!-- ভিডিওর জন্য সঠিক ক্লাস -->
+    <video id="hero-video" class="w-full h-full object-cover" autoplay muted loop playsinline>
+      <source src="school.mp4" type="video/mp4">
+    </video>
+    
+    <img id="hero-fallback-img" alt="Otarhat High School" class="w-full h-full object-cover hidden" src=""/>
+  </div>
+ 
     <div class="relative z-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
       <div class="max-w-xl">
         <h1 id="hero-title" class="font-headline text-3xl md:text-display-lg text-on-primary mb-4 md:mb-6">Reconnect with Otarhat High School</h1>
