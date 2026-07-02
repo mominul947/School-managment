@@ -196,9 +196,11 @@ tailwind.config = {
   <section class="relative h-[60vh] md:h-[80vh] flex items-center overflow-hidden bg-black">
     <div class="absolute inset-0 z-0">
       <div class="absolute inset-0 bg-primary/55 z-10"></div>
-      <video id="hero-video" class="w-full h-full object-cover object-center" autoplay muted loop playsinline poster="">
-        <!-- Admin can set the video URL via the admin panel. Source is injected by JS. -->
-      </video>
+  <!-- Hero Section এর ভেতরে এই অংশটি দেখুন -->
+<video id="hero-video" class="w-full h-full object-cover object-center" autoplay muted loop playsinline poster="path/to/your-poster-image.jpg">
+  <source src="school.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
       <img id="hero-fallback-img" alt="Otarhat High School" class="w-full h-full object-cover object-center hidden" src=""/>
     </div>
     <div class="relative z-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
@@ -499,12 +501,22 @@ function applyContent(c) {
 
   const video = document.getElementById('hero-video');
   const fallbackImg = document.getElementById('hero-fallback-img');
-  if (data.heroVideoUrl) {
-    video.innerHTML = `<source src="${data.heroVideoUrl}" type="video/mp4">`;
+  
+  // এখানে logic পরিবর্তন করা হয়েছে: যদি data.heroVideoUrl থাকে তবে সেটি, 
+  // না থাকলে 'school.mp4' ফাইলটি ব্যবহার হবে।
+  const videoSource = data.heroVideoUrl || "school.mp4";
+
+  if (videoSource) {
+    video.innerHTML = `<source src="${videoSource}" type="video/mp4">`;
     video.load();
     video.classList.remove('hidden');
     fallbackImg.classList.add('hidden');
-    video.onerror = () => { video.classList.add('hidden'); fallbackImg.src = data.heroImageUrl; fallbackImg.classList.remove('hidden'); };
+    
+    video.onerror = () => { 
+      video.classList.add('hidden'); 
+      fallbackImg.src = data.heroImageUrl; 
+      fallbackImg.classList.remove('hidden'); 
+    };
   } else {
     video.classList.add('hidden');
     fallbackImg.src = data.heroImageUrl;
@@ -522,11 +534,9 @@ function applyContent(c) {
   document.getElementById('stat3-label').textContent = data.stat3Label;
   document.getElementById('stat4-value').textContent = data.stat4Value;
   document.getElementById('stat4-label').textContent = data.stat4Label;
-
   document.getElementById('about-title').textContent = data.aboutTitle;
   document.getElementById('about-text').textContent = data.aboutText;
   document.getElementById('about-image').src = data.aboutImage;
-
   document.getElementById('footer-about').textContent = data.footerAbout;
 }
 
