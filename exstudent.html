@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ex-Student Association | Otarhat High School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-10">
+
+<div class="max-w-6xl mx-auto px-4">
+    <h1 class="text-3xl font-bold text-center text-[#0E2144] mb-10">Our Ex-Students</h1>
+    
+    <!-- স্টুডেন্ট কার্ডগুলো এখানে তৈরি হবে -->
+    <div id="student-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <p class="col-span-full text-center text-gray-500">Loading profiles...</p>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = { /* আপনার কনফিগারেশন */ };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Firestore থেকে সব ডাটা নিয়ে আসবে
+db.collection("exStudents").orderBy("batch", "desc").onSnapshot((snapshot) => {
+    const grid = document.getElementById('student-grid');
+    grid.innerHTML = '';
+    
+    snapshot.forEach((doc) => {
+        const s = doc.data();
+        grid.innerHTML += `
+            <div class="bg-white p-5 rounded-lg shadow hover:shadow-lg transition duration-300 border border-gray-200 flex flex-col items-center text-center">
+                <img src="${s.image || 'https://via.placeholder.com/150'}" class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-blue-100">
+                <h3 class="font-bold text-lg text-gray-800">${s.name}</h3>
+                <p class="text-sm text-blue-700 font-semibold mb-2">Batch: ${s.batch}</p>
+                <p class="text-xs text-gray-500 italic flex-grow">${s.desc}</p>
+            </div>
+        `;
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Board | Otarhat High School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Header (আপনার আগের ফাইলের স্টাইল অনুযায়ী) -->
+<header class="bg-[#0E2144] p-4 text-white shadow-md">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <h1 class="font-bold text-lg">📢 Notice Board</h1>
+        <a href="index.html" class="text-sm bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">← Back to Home</a>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-4xl mx-auto p-4 md:p-6">
+    <div id="notice-container" class="space-y-4">
+        <!-- Loading state -->
+        <div class="text-center py-10 text-gray-500">Loading notices...</div>
+    </div>
+</main>
+
+<script>
+    // Firebase Config (আপনার কনফিগারেশন বসান)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Firestore থেকে নোটিশ নিয়ে আসা
+    db.collection("notices").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        const container = document.getElementById('notice-container');
+        container.innerHTML = '';
+        
+        if (snapshot.empty) {
+            container.innerHTML = `
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 text-blue-700">
+                    <p>ℹ️ No notices are available right now.</p>
+                </div>
+            `;
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const n = doc.data();
+            container.innerHTML += `
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="font-bold text-gray-800 text-lg">${n.title}</h3>
+                    <p class="text-xs text-gray-400 mb-2">${n.date || ''}</p>
+                    <p class="text-gray-600 text-sm leading-relaxed">${n.message}</p>
+                </div>
+            `;
+        });
+    });
+</script>
+</body>
+</html>

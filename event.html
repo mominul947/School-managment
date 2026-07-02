@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | Otarhat High School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen py-10">
+
+<div class="max-w-5xl mx-auto px-4">
+    <h1 class="text-3xl font-bold text-[#0E2144] mb-8 text-center">Upcoming & Past Events</h1>
+    
+    <div id="event-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <p class="col-span-full text-center text-gray-500">Loading events...</p>
+    </div>
+</div>
+
+<!-- Modal for Details -->
+<div id="event-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg max-w-lg w-full p-6 relative">
+        <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl">&times;</button>
+        <img id="modal-img" class="w-full h-48 object-cover rounded mb-4">
+        <h2 id="modal-title" class="text-2xl font-bold text-[#0E2144]"></h2>
+        <p id="modal-date" class="text-sm text-gray-500 mb-4"></p>
+        <p id="modal-desc" class="text-gray-700"></p>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = { /* আপনার কনফিগারেশন */ };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ডাটা লোড
+db.collection("events").orderBy("date", "desc").onSnapshot((snapshot) => {
+    const grid = document.getElementById('event-grid');
+    grid.innerHTML = '';
+    
+    snapshot.forEach((doc) => {
+        const e = doc.data();
+        grid.innerHTML += `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <img src="${e.image}" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold text-lg text-gray-900">${e.title}</h3>
+                    <p class="text-sm text-gray-500 mb-3">${e.date}</p>
+                    <p class="text-sm text-gray-600 line-clamp-2">${e.description}</p>
+                    <button onclick="showDetails('${e.title}', '${e.image}', '${e.date}', '${e.description}')" 
+                        class="mt-4 w-full py-2 bg-[#0E2144] text-white rounded hover:bg-blue-900 transition">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+});
+
+function showDetails(title, img, date, desc) {
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-img').src = img;
+    document.getElementById('modal-date').innerText = date;
+    document.getElementById('modal-desc').innerText = desc;
+    document.getElementById('event-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('event-modal').classList.add('hidden');
+}
+</script>
+</body>
+</html>
