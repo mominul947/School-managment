@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery | Ex-Student Association Otarhat High School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
+<link rel="stylesheet" href="assets/style.css">
+<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+.chip.active{background:var(--brand); color:#fff;}
+#lightbox img, #lightbox video{max-height:85vh; max-width:90vw; border-radius:1rem;}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+</head>
+<body class="pb-16 lg:pb-0">
+<div id="site-header"></div>
+
+<section class="pt-32 pb-10 bg-brand text-center">
+  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Captured Memories</p>
+  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Gallery</h1>
+</section>
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+  <div id="gallery-chips" class="flex flex-wrap gap-2 mb-8">
+    <button data-cat="all" class="chip active px-4 py-2 rounded-full text-xs font-bold surface">All</button>
+  </div>
+  <div id="gallery-grid" class="columns-2 md:columns-3 lg:columns-4 gap-3 [&>*]:mb-3">
+    <div class="skeleton h-40"></div><div class="skeleton h-56"></div><div class="skeleton h-32"></div><div class="skeleton h-48"></div>
+  </div>
+</main>
+
+<div id="lightbox" class="hidden fixed inset-0 bg-black/90 z-[200] items-center justify-center flex-col">
+  <button onclick="closeLightbox()" class="absolute top-5 right-5 text-white p-2 rounded-full hover:bg-white/10"><span class="material-symbols-rounded text-3xl">close</span></button>
+  <div id="lightbox-content"></div>
+  <div class="flex gap-3 mt-5">
+    <button onclick="lbDownload()" class="px-4 py-2 rounded-xl bg-white/10 text-white text-sm font-semibold flex items-center gap-1.5"><span class="material-symbols-rounded text-lg">download</span>Download</button>
+    <button onclick="lbShare()" class="px-4 py-2 rounded-xl bg-white/10 text-white text-sm font-semibold flex items-center gap-1.5"><span class="material-symbols-rounded text-lg">share</span>Share</button>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+<script src="assets/site.js"></script>
+<script>
+bootSite("gallery.html");
+let allMedia = [], activeCat = "all", lbUrl = "";
+
+db.collection("gallery").orderBy("createdAt", "desc").onSnapshot((snap) => {
+  allMedia = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((g) => g.status !== "inactive");
+  const cats = [...new Set(allMedia.map((g) => g.category).filter(Boolean))];
+  document.getElementById("gallery-chips").innerHTML = `<button data-cat="all" class="chip ${activeCat === "all" ? "active" : ""} px-4 py-2 rounded-full text-xs font-bold surface">All</button>` +
+    cats.map((c) => `<button data-cat="${escapeHtml(c)}" class="chip ${activeCat === c ? "active" : ""} px-4 py-2 rounded-full text-xs font-bold surface">${escapeHtml(c)}</button>`).join("");
+  render();
+}, () => { document.getElementById("gallery-grid").innerHTML = `<div class="empty-state">Could not load gallery.</div>`; });
+
+function render() {
+  let items = allMedia;
+  if (activeCat !== "all") items = items.filter((g) => g.category === activeCat);
+  const grid = document.getElementById("gallery-grid");
+  if (!items.length) { grid.innerHTML = `<div class="empty-state"><span class="material-symbols-rounded text-4xl mb-2 opacity-40">photo_library</span>No media found.</div>`; return; }
+  grid.innerHTML = items.map((g) => {
+    const isVideo = /\.(mp4|webm|mov)$/i.test(g.image || "");
+    return `<div class="card break-inside-avoid overflow-hidden cursor-pointer relative group" onclick="openLightbox('${g.image}', ${isVideo}, ${JSON.stringify(g.title || "").replace(/"/g, "&quot;")})">
+      ${isVideo ? `<video src="${g.image}" class="w-full object-cover" muted loop></video><span class="material-symbols-rounded absolute inset-0 m-auto text-white text-4xl h-fit w-fit">play_circle</span>` : `<img src="${g.image}" loading="lazy" class="w-full object-cover">`}
+      ${g.title ? `<p class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-2 opacity-0 group-hover:opacity-100 transition">${escapeHtml(g.title)}</p>` : ""}
+    </div>`;
+  }).join("");
+}
+document.getElementById("gallery-chips").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-cat]"); if (!btn) return;
+  document.querySelectorAll("#gallery-chips .chip").forEach((c) => c.classList.remove("active"));
+  btn.classList.add("active"); activeCat = btn.dataset.cat; render();
+});
+function openLightbox(url, isVideo, title) {
+  lbUrl = url;
+  document.getElementById("lightbox-content").innerHTML = isVideo ? `<video src="${url}" controls autoplay class="rounded-2xl"></video>` : `<img src="${url}" class="rounded-2xl">`;
+  document.getElementById("lightbox").classList.remove("hidden");
+  document.getElementById("lightbox").classList.add("flex");
+}
+function closeLightbox() { document.getElementById("lightbox").classList.add("hidden"); document.getElementById("lightbox").classList.remove("flex"); document.getElementById("lightbox-content").innerHTML = ""; }
+function lbDownload() { const a = document.createElement("a"); a.href = lbUrl; a.download = ""; a.target = "_blank"; a.click(); }
+function lbShare() { if (navigator.share) navigator.share({ url: lbUrl }); else { navigator.clipboard.writeText(lbUrl); showToast("Link copied"); } }
+</script>
+</body>
+</html>

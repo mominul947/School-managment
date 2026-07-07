@@ -1,70 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notice Board | Otarhat High School</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notice Board | Ex-Student Association Otarhat High School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
+<link rel="stylesheet" href="assets/style.css">
+<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="pb-16 lg:pb-0">
+<div id="site-header"></div>
 
-<!-- Header (আপনার আগের ফাইলের স্টাইল অনুযায়ী) -->
-<header class="bg-[#0E2144] p-4 text-white shadow-md">
-    <div class="max-w-4xl mx-auto flex justify-between items-center">
-        <h1 class="font-bold text-lg">📢 Notice Board</h1>
-        <a href="index.html" class="text-sm bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">← Back to Home</a>
-    </div>
-</header>
+<section class="pt-32 pb-10 bg-brand text-center">
+  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">📢 Stay Updated</p>
+  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Notice Board</h1>
+</section>
 
-<!-- Main Content -->
-<main class="max-w-4xl mx-auto p-4 md:p-6">
-    <div id="notice-container" class="space-y-4">
-        <!-- Loading state -->
-        <div class="text-center py-10 text-gray-500">Loading notices...</div>
-    </div>
+<main class="max-w-4xl mx-auto px-4 py-12">
+  <div class="relative mb-8">
+    <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 opacity-40 text-lg">search</span>
+    <input id="notice-search" placeholder="Search notices..." class="w-full pl-9 pr-3 py-3 rounded-xl surface text-sm outline-none focus:ring-2 focus:ring-accent">
+  </div>
+  <div id="notice-container" class="space-y-4">
+    <div class="skeleton h-24"></div><div class="skeleton h-24"></div><div class="skeleton h-24"></div>
+  </div>
 </main>
 
+<div id="site-footer"></div>
+<script src="assets/site.js"></script>
 <script>
-    // Firebase Config (আপনার কনফিগারেশন বসান)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+bootSite("notice.html");
+let allNotices = [], searchTerm = "";
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+db.collection("notices").orderBy("createdAt", "desc").onSnapshot((snap) => {
+  allNotices = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((n) => n.published !== false && n.status !== "inactive");
+  render();
+}, () => { document.getElementById("notice-container").innerHTML = `<div class="empty-state">Could not load notices.</div>`; });
 
-    // Firestore থেকে নোটিশ নিয়ে আসা
-    db.collection("notices").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        const container = document.getElementById('notice-container');
-        container.innerHTML = '';
-        
-        if (snapshot.empty) {
-            container.innerHTML = `
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 text-blue-700">
-                    <p>ℹ️ No notices are available right now.</p>
-                </div>
-            `;
-            return;
-        }
+function render() {
+  let items = allNotices;
+  if (searchTerm) items = items.filter((n) => (n.title || "").toLowerCase().includes(searchTerm) || (n.description || "").toLowerCase().includes(searchTerm));
+  items = [...items].sort((a, b) => (b.pinned === true) - (a.pinned === true));
+  const container = document.getElementById("notice-container");
+  if (!items.length) { container.innerHTML = `<div class="empty-state"><span class="material-symbols-rounded text-4xl mb-2 opacity-40">campaign</span>No notices available right now.</div>`; return; }
+  container.innerHTML = items.map((n) => `
+    <div id="notice-${n.id}" class="card surface p-5 relative">
+      ${n.pinned ? `<span class="badge-pin absolute -top-2 -left-2 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1"><span class="material-symbols-rounded text-xs">push_pin</span>PINNED</span>` : ""}
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg">${escapeHtml(n.title)}</h3>
+          <p class="text-xs opacity-50 mb-2">${fmtDate(n.createdAt)}${n.scheduleDate ? " • Scheduled: " + escapeHtml(n.scheduleDate) : ""}</p>
+          <p class="text-sm opacity-75 leading-relaxed">${escapeHtml(n.description || "")}</p>
+          ${n.attachment ? `<img src="${n.attachment}" class="mt-3 rounded-xl max-h-64 object-cover">` : ""}
+        </div>
+        <div class="flex flex-col gap-1.5 shrink-0">
+          <button onclick='shareNotice(${JSON.stringify(n.title).replace(/'/g, "&apos;")}, "${n.id}")' class="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10" title="Share"><span class="material-symbols-rounded text-lg">share</span></button>
+          <button onclick="printNotice('${n.id}')" class="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10" title="Print / Save as PDF"><span class="material-symbols-rounded text-lg">picture_as_pdf</span></button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+document.getElementById("notice-search").addEventListener("input", (e) => { searchTerm = e.target.value.toLowerCase(); render(); });
 
-        snapshot.forEach((doc) => {
-            const n = doc.data();
-            container.innerHTML += `
-                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
-                    <h3 class="font-bold text-gray-800 text-lg">${n.title}</h3>
-                    <p class="text-xs text-gray-400 mb-2">${n.date || ''}</p>
-                    <p class="text-gray-600 text-sm leading-relaxed">${n.message}</p>
-                </div>
-            `;
-        });
-    });
+function shareNotice(title, id) {
+  const url = location.href.split("#")[0] + "#notice-" + id;
+  if (navigator.share) navigator.share({ title, url });
+  else { navigator.clipboard.writeText(url); showToast("Link copied to clipboard"); }
+}
+function printNotice(id) {
+  const el = document.getElementById("notice-" + id);
+  const w = window.open("", "_blank");
+  w.document.write(`<html><head><title>Notice</title><style>body{font-family:sans-serif;padding:32px;}</style></head><body>${el.innerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
 </script>
 </body>
 </html>

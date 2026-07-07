@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Membership | Ex-Student Association Otarhat High School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
+<link rel="stylesheet" href="assets/style.css">
+<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+.step{opacity:.4;} .step.done{opacity:1;}
+.step.done .dot{background:var(--accent); color:#fff;}
+.dot{width:2rem;height:2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--border);font-size:14px;font-weight:700;}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+</head>
+<body class="pb-16 lg:pb-0">
+<div id="site-header"></div>
+
+<section class="pt-32 pb-10 bg-brand text-center">
+  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Join The Family</p>
+  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Membership</h1>
+</section>
+
+<main class="max-w-3xl mx-auto px-4 py-12">
+  <div id="login-required" class="hidden empty-state surface card p-10">
+    <span class="material-symbols-rounded text-5xl mb-3 opacity-40">lock</span>
+    <p class="mb-4">Please login to apply for membership.</p>
+    <a href="login.html" class="btn-grad px-6 py-2.5 rounded-xl font-bold text-sm">Login</a>
+  </div>
+
+  <div id="membership-app" class="hidden space-y-8">
+    <!-- Status tracker -->
+    <div class="surface card p-6">
+      <h2 class="font-display font-extrabold text-lg mb-4">Application Status</h2>
+      <div id="status-track" class="flex items-center justify-between text-xs font-bold text-center">
+        <div class="step flex-1" data-step="1"><div class="dot mx-auto mb-1">1</div>Submitted</div>
+        <div class="flex-1 h-0.5 bg-[var(--border)]"></div>
+        <div class="step flex-1" data-step="2"><div class="dot mx-auto mb-1">2</div>Under Review</div>
+        <div class="flex-1 h-0.5 bg-[var(--border)]"></div>
+        <div class="step flex-1" data-step="3"><div class="dot mx-auto mb-1">3</div>Approved</div>
+      </div>
+      <div id="status-detail" class="mt-5"></div>
+    </div>
+
+    <!-- Certificate / active member card -->
+    <div id="certificate-box" class="hidden surface card p-6">
+      <h2 class="font-display font-extrabold text-lg mb-4">Your Membership</h2>
+      <div id="certificate-content"></div>
+      <button onclick="downloadCertificate()" class="mt-4 btn-grad px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-1.5"><span class="material-symbols-rounded text-lg">download</span>Download Certificate</button>
+    </div>
+
+    <!-- Apply form -->
+    <div id="apply-box" class="surface card p-6 md:p-8">
+      <h2 class="font-display font-extrabold text-lg mb-5">Apply for Membership</h2>
+      <form id="membership-form" class="space-y-4">
+        <div class="flex items-center gap-4">
+          <img id="mf-photo-preview" src="https://placehold.co/100x100?text=Photo" class="w-16 h-16 rounded-full object-cover border">
+          <label class="text-sm font-semibold px-4 py-2 rounded-xl surface border border-[var(--border)] cursor-pointer">
+            Upload Photo <input type="file" id="mf-photo" accept="image/*" class="hidden">
+          </label>
+        </div>
+        <input required id="mf-name" placeholder="Full Name" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
+        <input required id="mf-batch" placeholder="Batch (e.g. 2005)" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
+        <select id="mf-type" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
+          <option value="General">General Membership</option>
+          <option value="Life">Life Membership</option>
+          <option value="Honorary">Honorary Membership</option>
+        </select>
+        <textarea id="mf-desc" rows="3" placeholder="A short note about yourself (optional)" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent"></textarea>
+        <div class="p-4 rounded-xl bg-black/5 dark:bg-white/5">
+          <p class="text-xs font-bold uppercase tracking-wide opacity-60 mb-2">Membership Fee Payment</p>
+          <p class="text-xs opacity-60 mb-3">Send the membership fee via bKash/Nagad to the association number listed on the Contact page, then enter the transaction ID below.</p>
+          <input id="mf-payment" placeholder="Transaction / Reference ID (optional)" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
+        </div>
+        <button type="submit" id="mf-submit" class="w-full py-3 btn-grad rounded-xl font-bold text-sm">Submit Application</button>
+      </form>
+    </div>
+
+    <!-- History -->
+    <div class="surface card p-6">
+      <h2 class="font-display font-extrabold text-lg mb-4">Membership History</h2>
+      <div id="history-list" class="space-y-3 text-sm"><p class="opacity-50 text-xs">No previous applications.</p></div>
+    </div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+<script src="assets/site.js"></script>
+<script>
+bootSite("membership.html");
+let photoDataUrl = null;
+
+document.getElementById("mf-photo").addEventListener("change", (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { photoDataUrl = reader.result; document.getElementById("mf-photo-preview").src = reader.result; };
+  reader.readAsDataURL(file);
+});
+
+document.addEventListener("auth-ready", (e) => {
+  const userDoc = e.detail;
+  if (!SITE.user) { document.getElementById("login-required").classList.remove("hidden"); document.getElementById("membership-app").classList.add("hidden"); return; }
+  document.getElementById("login-required").classList.add("hidden");
+  document.getElementById("membership-app").classList.remove("hidden");
+  if (userDoc?.name) document.getElementById("mf-name").value = userDoc.name;
+  if (userDoc?.batch) document.getElementById("mf-batch").value = userDoc.batch;
+  loadMembershipStatus();
+});
+
+function loadMembershipStatus() {
+  const uid = SITE.user.uid;
+  // Active membership record (post-approval, lives in `membership` collection)
+  db.collection("membership").where("uid", "==", uid).limit(1).get().then((snap) => {
+    if (!snap.empty) {
+      const m = snap.docs[0].data();
+      setStep(3);
+      document.getElementById("status-detail").innerHTML = `<div class="empty-state py-2 text-emerald-600 text-sm font-semibold"><span class="material-symbols-rounded text-3xl mb-1">verified</span>You are an active ${escapeHtml(m.memberType || "General")} member!</div>`;
+      document.getElementById("apply-box").classList.add("hidden");
+      document.getElementById("certificate-box").classList.remove("hidden");
+      renderCertificate(m);
+    } else {
+      loadRequests(uid);
+    }
+  }).catch(() => loadRequests(uid));
+}
+
+function loadRequests(uid) {
+  db.collection("membershipRequests").where("uid", "==", uid).get().then((snap) => {
+    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+    const latest = items[0];
+    if (!latest) { setStep(0); document.getElementById("status-detail").innerHTML = `<p class="text-sm opacity-60 mt-3">You haven't applied for membership yet. Fill the form below to get started.</p>`; return; }
+    if (latest.status === "pending") { setStep(2); document.getElementById("status-detail").innerHTML = `<p class="text-sm opacity-70 mt-3">Your application is under review by the association admins.</p>`; document.getElementById("apply-box").classList.add("hidden"); }
+    else if (latest.status === "rejected") { setStep(1); document.getElementById("status-detail").innerHTML = `<p class="text-sm text-red-500 mt-3">Your last application was rejected. You may re-apply below.</p>`; }
+    else { setStep(3); }
+
+    const hist = document.getElementById("history-list");
+    hist.innerHTML = items.length ? items.map((r) => `
+      <div class="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5">
+        <div><p class="font-semibold">${escapeHtml(r.memberType || "General")} Membership</p><p class="text-xs opacity-50">${fmtDate(r.createdAt)}</p></div>
+        <span class="px-2 py-1 rounded-full text-xs font-bold ${statusBadgeClass(r.status)}">${r.status}</span>
+      </div>`).join("") : `<p class="opacity-50 text-xs">No previous applications.</p>`;
+  });
+}
+function setStep(n) {
+  document.querySelectorAll(".step").forEach((el) => el.classList.toggle("done", parseInt(el.dataset.step) <= n));
+}
+function renderCertificate(m) {
+  const box = document.getElementById("certificate-content");
+  box.innerHTML = `
+    <div class="id-card p-6 max-w-sm mx-auto">
+      <p class="text-xs uppercase tracking-widest opacity-80">Ex-Student Association</p>
+      <p class="font-display font-extrabold text-lg mb-4">Otarhat High School</p>
+      <img src="${m.photo || "https://placehold.co/100x100?text=Photo"}" class="w-16 h-16 rounded-full object-cover border-2 border-white/50 mb-3">
+      <p class="font-bold text-xl">${escapeHtml(m.name)}</p>
+      <p class="text-sm opacity-80">${escapeHtml(m.memberType || "General")} Member • Batch ${escapeHtml(m.batch || "-")}</p>
+      <p class="text-xs opacity-60 mt-3">Member ID: OHSA-${SITE.user.uid.slice(0, 4).toUpperCase()}-${SITE.user.uid.slice(-4).toUpperCase()}</p>
+    </div>`;
+}
+function downloadCertificate() {
+  const content = document.getElementById("certificate-content").innerHTML;
+  const w = window.open("", "_blank");
+  w.document.write(`<html><head><title>Membership Certificate</title><style>body{font-family:sans-serif;padding:40px;display:flex;justify-content:center;} .id-card{background:linear-gradient(135deg,#0E2144,#2F6FED);color:#fff;border-radius:24px;padding:32px;width:360px;}</style></head><body>${content}</body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+
+document.getElementById("membership-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("mf-submit");
+  btn.disabled = true; btn.textContent = "Submitting...";
+  try {
+    let photoUrl = photoDataUrl || SITE.userDoc?.photo || "";
+    await db.collection("membershipRequests").add({
+      uid: SITE.user.uid,
+      email: SITE.user.email,
+      name: document.getElementById("mf-name").value,
+      batch: document.getElementById("mf-batch").value,
+      memberType: document.getElementById("mf-type").value,
+      description: document.getElementById("mf-desc").value,
+      photo: photoUrl,
+      paymentRef: document.getElementById("mf-payment").value,
+      status: "pending",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    showToast("Application submitted! We'll notify you once reviewed.");
+    loadMembershipStatus();
+    document.getElementById("apply-box").classList.add("hidden");
+  } catch (err) { showToast("Submission failed: " + err.message, "error"); }
+  btn.disabled = false; btn.textContent = "Submit Application";
+});
+</script>
+</body>
+</html>

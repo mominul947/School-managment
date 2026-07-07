@@ -1,46 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ex-Student Association | Otarhat High School</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ex Students | Ex-Student Association Otarhat High School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
+<link rel="stylesheet" href="assets/style.css">
+<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen py-10">
+<body class="pb-16 lg:pb-0">
+<div id="site-header"></div>
 
-<div class="max-w-6xl mx-auto px-4">
-    <h1 class="text-3xl font-bold text-center text-[#0E2144] mb-10">Our Ex-Students</h1>
-    
-    <!-- স্টুডেন্ট কার্ডগুলো এখানে তৈরি হবে -->
-    <div id="student-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <p class="col-span-full text-center text-gray-500">Loading profiles...</p>
+<section class="pt-32 pb-10 bg-brand text-center">
+  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Alumni Directory</p>
+  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Our Ex-Students</h1>
+</section>
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+  <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between mb-8">
+    <div class="relative w-full md:w-56">
+      <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 opacity-40 text-lg">calendar_month</span>
+      <select id="batch-filter" class="w-full pl-9 pr-3 py-2.5 rounded-xl surface text-sm outline-none focus:ring-2 focus:ring-accent appearance-none">
+        <option value="all">All Batches</option>
+      </select>
     </div>
-</div>
+    <div class="relative w-full md:w-64">
+      <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 opacity-40 text-lg">search</span>
+      <input id="student-search" placeholder="Search name or occupation..." class="w-full pl-9 pr-3 py-2.5 rounded-xl surface text-sm outline-none focus:ring-2 focus:ring-accent">
+    </div>
+  </div>
 
+  <div id="student-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="skeleton h-64"></div><div class="skeleton h-64"></div><div class="skeleton h-64"></div><div class="skeleton h-64"></div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+<script src="assets/site.js"></script>
 <script>
-const firebaseConfig = { /* আপনার কনফিগারেশন */ };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+bootSite("exstudent.html");
+let allStudents = [], activeBatch = "all", searchTerm = "";
 
-// Firestore থেকে সব ডাটা নিয়ে আসবে
-db.collection("exStudents").orderBy("batch", "desc").onSnapshot((snapshot) => {
-    const grid = document.getElementById('student-grid');
-    grid.innerHTML = '';
-    
-    snapshot.forEach((doc) => {
-        const s = doc.data();
-        grid.innerHTML += `
-            <div class="bg-white p-5 rounded-lg shadow hover:shadow-lg transition duration-300 border border-gray-200 flex flex-col items-center text-center">
-                <img src="${s.image || 'https://via.placeholder.com/150'}" class="w-24 h-24 rounded-full object-cover mb-4 border-2 border-blue-100">
-                <h3 class="font-bold text-lg text-gray-800">${s.name}</h3>
-                <p class="text-sm text-blue-700 font-semibold mb-2">Batch: ${s.batch}</p>
-                <p class="text-xs text-gray-500 italic flex-grow">${s.desc}</p>
-            </div>
-        `;
-    });
-});
+db.collection("exStudents").orderBy("batch", "desc").onSnapshot((snap) => {
+  allStudents = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((s) => s.status !== "inactive");
+  const batches = [...new Set(allStudents.map((s) => s.batch).filter(Boolean))].sort().reverse();
+  const sel = document.getElementById("batch-filter");
+  sel.innerHTML = `<option value="all">All Batches</option>` + batches.map((b) => `<option value="${escapeHtml(b)}">Batch ${escapeHtml(b)}</option>`).join("");
+  render();
+}, () => { document.getElementById("student-grid").innerHTML = `<div class="empty-state col-span-full">Could not load alumni.</div>`; });
+
+function render() {
+  let items = allStudents;
+  if (activeBatch !== "all") items = items.filter((s) => s.batch === activeBatch);
+  if (searchTerm) items = items.filter((s) => (s.name || "").toLowerCase().includes(searchTerm) || (s.occupation || "").toLowerCase().includes(searchTerm));
+  const grid = document.getElementById("student-grid");
+  if (!items.length) { grid.innerHTML = `<div class="empty-state col-span-full"><span class="material-symbols-rounded text-4xl mb-2 opacity-40">diversity_3</span>No alumni found.</div>`; return; }
+  grid.innerHTML = items.map((s) => `
+    <div class="card surface p-5 text-center">
+      <img src="${s.photo || "https://placehold.co/200x200?text=Photo"}" class="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-accent/20">
+      <h3 class="font-bold text-sm">${escapeHtml(s.name)}</h3>
+      <p class="text-xs text-accent font-semibold mt-1">Batch ${escapeHtml(s.batch || "-")}</p>
+      <p class="text-xs opacity-60 mt-1">${escapeHtml(s.occupation || "")}</p>
+      <p class="text-[11px] opacity-50 mt-2 line-clamp-2">${escapeHtml(s.description || "")}</p>
+    </div>`).join("");
+}
+document.getElementById("batch-filter").addEventListener("change", (e) => { activeBatch = e.target.value; render(); });
+document.getElementById("student-search").addEventListener("input", (e) => { searchTerm = e.target.value.toLowerCase(); render(); });
 </script>
 </body>
 </html>

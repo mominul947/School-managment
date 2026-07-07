@@ -1,73 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events | Otarhat High School</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events | Ex-Student Association Otarhat High School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
+<link rel="stylesheet" href="assets/style.css">
+<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+.cd-box{background:rgba(255,255,255,.12);}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen py-10">
+<body class="pb-16 lg:pb-0">
+<div id="site-header"></div>
 
-<div class="max-w-5xl mx-auto px-4">
-    <h1 class="text-3xl font-bold text-[#0E2144] mb-8 text-center">Upcoming & Past Events</h1>
-    
-    <div id="event-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <p class="col-span-full text-center text-gray-500">Loading events...</p>
+<section class="pt-32 pb-10 bg-brand text-center">
+  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Gather. Celebrate. Reconnect.</p>
+  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Upcoming & Past Events</h1>
+</section>
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+  <div id="event-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="skeleton h-80"></div><div class="skeleton h-80"></div><div class="skeleton h-80"></div>
+  </div>
+</main>
+
+<!-- Detail modal -->
+<div id="event-modal" class="hidden fixed inset-0 bg-black/70 z-[150] items-start justify-center overflow-y-auto p-4 py-10">
+  <div class="surface rounded-2xl max-w-2xl w-full p-0 relative fade-in overflow-hidden">
+    <button onclick="closeEventModal()" class="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/40 text-white hover:bg-black/60"><span class="material-symbols-rounded">close</span></button>
+    <img id="em-banner" class="w-full h-56 md:h-72 object-cover">
+    <div class="p-6 md:p-8">
+      <h2 id="em-title" class="font-display font-extrabold text-2xl mb-2"></h2>
+      <div class="flex flex-wrap gap-4 text-sm opacity-70 mb-4">
+        <span class="flex items-center gap-1"><span class="material-symbols-rounded text-base">calendar_month</span><span id="em-date"></span></span>
+        <span class="flex items-center gap-1"><span class="material-symbols-rounded text-base">location_on</span><span id="em-location"></span></span>
+      </div>
+
+      <div id="em-countdown" class="grid grid-cols-4 gap-2 mb-6 hidden">
+        <div class="cd-box bg-brand text-white rounded-xl p-3 text-center"><p class="text-xl font-bold" id="cd-d">0</p><p class="text-[10px] opacity-70">DAYS</p></div>
+        <div class="cd-box bg-brand text-white rounded-xl p-3 text-center"><p class="text-xl font-bold" id="cd-h">0</p><p class="text-[10px] opacity-70">HRS</p></div>
+        <div class="cd-box bg-brand text-white rounded-xl p-3 text-center"><p class="text-xl font-bold" id="cd-m">0</p><p class="text-[10px] opacity-70">MIN</p></div>
+        <div class="cd-box bg-brand text-white rounded-xl p-3 text-center"><p class="text-xl font-bold" id="cd-s">0</p><p class="text-[10px] opacity-70">SEC</p></div>
+      </div>
+
+      <p id="em-desc" class="text-sm opacity-80 leading-relaxed mb-6"></p>
+
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button id="em-register" onclick="toggleRegister()" class="btn-grad px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5"><span class="material-symbols-rounded text-lg">how_to_reg</span>Register</button>
+        <button id="em-fav" onclick="toggleFav()" class="btn-outline px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5"><span class="material-symbols-rounded text-lg" id="em-fav-icon">favorite_border</span>Save</button>
+        <button onclick="shareEvent()" class="btn-outline px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5"><span class="material-symbols-rounded text-lg">share</span>Share</button>
+      </div>
+
+      <div id="em-map-wrap" class="mb-6 hidden">
+        <h4 class="font-bold text-sm mb-2">Location</h4>
+        <iframe id="em-map" class="w-full h-52 rounded-xl border-0" loading="lazy"></iframe>
+      </div>
+
+      <div id="em-gallery-wrap" class="mb-6 hidden">
+        <h4 class="font-bold text-sm mb-2">Gallery</h4>
+        <div id="em-gallery" class="grid grid-cols-3 gap-2"></div>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-sm mb-3">Comments</h4>
+        <div id="em-comments" class="space-y-3 mb-4 max-h-56 overflow-y-auto"></div>
+        <div id="em-comment-form" class="flex gap-2">
+          <input id="em-comment-input" placeholder="Write a comment..." class="flex-1 px-3 py-2 rounded-xl surface text-sm outline-none focus:ring-2 focus:ring-accent">
+          <button onclick="postComment()" class="btn-grad px-4 py-2 rounded-xl text-sm font-bold">Post</button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- Modal for Details -->
-<div id="event-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg max-w-lg w-full p-6 relative">
-        <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl">&times;</button>
-        <img id="modal-img" class="w-full h-48 object-cover rounded mb-4">
-        <h2 id="modal-title" class="text-2xl font-bold text-[#0E2144]"></h2>
-        <p id="modal-date" class="text-sm text-gray-500 mb-4"></p>
-        <p id="modal-desc" class="text-gray-700"></p>
-    </div>
-</div>
-
+<div id="site-footer"></div>
+<script src="assets/site.js"></script>
 <script>
-const firebaseConfig = { /* আপনার কনফিগারেশন */ };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+bootSite("event.html");
+let allEvents = [], currentEvent = null, cdInterval = null, commentsUnsub = null;
 
-// ডাটা লোড
-db.collection("events").orderBy("date", "desc").onSnapshot((snapshot) => {
-    const grid = document.getElementById('event-grid');
-    grid.innerHTML = '';
-    
-    snapshot.forEach((doc) => {
-        const e = doc.data();
-        grid.innerHTML += `
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <img src="${e.image}" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-lg text-gray-900">${e.title}</h3>
-                    <p class="text-sm text-gray-500 mb-3">${e.date}</p>
-                    <p class="text-sm text-gray-600 line-clamp-2">${e.description}</p>
-                    <button onclick="showDetails('${e.title}', '${e.image}', '${e.date}', '${e.description}')" 
-                        class="mt-4 w-full py-2 bg-[#0E2144] text-white rounded hover:bg-blue-900 transition">
-                        View Details
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-});
+db.collection("events").orderBy("createdAt", "desc").onSnapshot((snap) => {
+  allEvents = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((e) => e.published !== false && e.status !== "inactive");
+  const grid = document.getElementById("event-grid");
+  if (!allEvents.length) { grid.innerHTML = `<div class="empty-state col-span-full"><span class="material-symbols-rounded text-4xl mb-2 opacity-40">event</span>No events yet.</div>`; return; }
+  grid.innerHTML = allEvents.map((e) => `
+    <div class="card surface overflow-hidden cursor-pointer" onclick="openEvent('${e.id}')">
+      <img src="${e.banner || "https://placehold.co/500x300?text=Event"}" class="w-full h-48 object-cover">
+      <div class="p-5">
+        <h3 class="font-bold text-lg mb-1 line-clamp-2">${escapeHtml(e.title)}</h3>
+        <p class="text-xs opacity-60 mb-3 flex items-center gap-1"><span class="material-symbols-rounded text-sm">calendar_month</span>${escapeHtml(e.eventDate || "")}</p>
+        <p class="text-sm opacity-70 line-clamp-2 mb-4">${escapeHtml(e.description || "")}</p>
+        <button class="w-full py-2 btn-grad rounded-xl text-sm font-bold">View Details</button>
+      </div>
+    </div>`).join("");
+}, () => { document.getElementById("event-grid").innerHTML = `<div class="empty-state col-span-full">Could not load events.</div>`; });
 
-function showDetails(title, img, date, desc) {
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('modal-img').src = img;
-    document.getElementById('modal-date').innerText = date;
-    document.getElementById('modal-desc').innerText = desc;
-    document.getElementById('event-modal').classList.remove('hidden');
+function openEvent(id) {
+  currentEvent = allEvents.find((e) => e.id === id);
+  if (!currentEvent) return;
+  document.getElementById("em-banner").src = currentEvent.banner || "https://placehold.co/800x400?text=Event";
+  document.getElementById("em-title").textContent = currentEvent.title || "";
+  document.getElementById("em-date").textContent = currentEvent.eventDate || "TBA";
+  document.getElementById("em-location").textContent = currentEvent.location || "TBA";
+  document.getElementById("em-desc").textContent = currentEvent.description || "";
+
+  // countdown
+  clearInterval(cdInterval);
+  const cdBox = document.getElementById("em-countdown");
+  const target = currentEvent.eventDate ? new Date(currentEvent.eventDate).getTime() : NaN;
+  if (!isNaN(target) && target > Date.now()) {
+    cdBox.classList.remove("hidden");
+    cdInterval = setInterval(() => {
+      const diff = target - Date.now();
+      if (diff <= 0) { clearInterval(cdInterval); cdBox.classList.add("hidden"); return; }
+      document.getElementById("cd-d").textContent = Math.floor(diff / 86400000);
+      document.getElementById("cd-h").textContent = Math.floor((diff / 3600000) % 24);
+      document.getElementById("cd-m").textContent = Math.floor((diff / 60000) % 60);
+      document.getElementById("cd-s").textContent = Math.floor((diff / 1000) % 60);
+    }, 1000);
+  } else cdBox.classList.add("hidden");
+
+  // map
+  const mapWrap = document.getElementById("em-map-wrap");
+  if (currentEvent.location) {
+    mapWrap.classList.remove("hidden");
+    document.getElementById("em-map").src = `https://www.google.com/maps?q=${encodeURIComponent(currentEvent.location)}&output=embed`;
+  } else mapWrap.classList.add("hidden");
+
+  // gallery
+  const galWrap = document.getElementById("em-gallery-wrap");
+  const urls = (currentEvent.gallery || "").split(",").map((u) => u.trim()).filter(Boolean);
+  if (urls.length) {
+    galWrap.classList.remove("hidden");
+    document.getElementById("em-gallery").innerHTML = urls.map((u) => `<img src="${u}" class="w-full h-20 object-cover rounded-lg cursor-pointer" onclick="window.open('${u}','_blank')">`).join("");
+  } else galWrap.classList.add("hidden");
+
+  // favourite state
+  const favs = JSON.parse(localStorage.getItem("ohsa-fav-events") || "[]");
+  document.getElementById("em-fav-icon").textContent = favs.includes(id) ? "favorite" : "favorite_border";
+
+  // register state
+  updateRegisterButton();
+
+  // comments
+  if (commentsUnsub) commentsUnsub();
+  commentsUnsub = db.collection("events").doc(id).collection("comments").orderBy("createdAt", "desc").limit(30)
+    .onSnapshot((snap) => {
+      const list = document.getElementById("em-comments");
+      const items = snap.docs.map((d) => d.data());
+      list.innerHTML = items.length ? items.map((c) => `
+        <div class="flex gap-2">
+          <div class="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center text-xs font-bold shrink-0">${(c.name || "U")[0].toUpperCase()}</div>
+          <div><p class="text-xs font-bold">${escapeHtml(c.name || "User")} <span class="font-normal opacity-50">${timeAgo(c.createdAt)}</span></p><p class="text-sm opacity-80">${escapeHtml(c.text)}</p></div>
+        </div>`).join("") : `<p class="text-xs opacity-50">Be the first to comment.</p>`;
+    }, () => {});
+
+  document.getElementById("event-modal").classList.remove("hidden");
+  document.getElementById("event-modal").classList.add("flex");
 }
-
-function closeModal() {
-    document.getElementById('event-modal').classList.add('hidden');
+function closeEventModal() {
+  document.getElementById("event-modal").classList.add("hidden");
+  document.getElementById("event-modal").classList.remove("flex");
+  clearInterval(cdInterval);
+  if (commentsUnsub) commentsUnsub();
+}
+function toggleFav() {
+  if (!currentEvent) return;
+  let favs = JSON.parse(localStorage.getItem("ohsa-fav-events") || "[]");
+  const icon = document.getElementById("em-fav-icon");
+  if (favs.includes(currentEvent.id)) { favs = favs.filter((f) => f !== currentEvent.id); icon.textContent = "favorite_border"; showToast("Removed from saved events"); }
+  else { favs.push(currentEvent.id); icon.textContent = "favorite"; showToast("Saved to favourites"); }
+  localStorage.setItem("ohsa-fav-events", JSON.stringify(favs));
+}
+function shareEvent() {
+  const url = location.href.split("#")[0] + "#event=" + currentEvent.id;
+  if (navigator.share) navigator.share({ title: currentEvent.title, text: currentEvent.description, url });
+  else { navigator.clipboard.writeText(url); showToast("Link copied to clipboard"); }
+}
+async function updateRegisterButton() {
+  const btn = document.getElementById("em-register");
+  if (!SITE.user) { btn.innerHTML = `<span class="material-symbols-rounded text-lg">how_to_reg</span>Login to Register`; btn.onclick = () => (location.href = "login.html"); return; }
+  const regDoc = await db.collection("events").doc(currentEvent.id).collection("registrations").doc(SITE.user.uid).get();
+  if (regDoc.exists) { btn.innerHTML = `<span class="material-symbols-rounded text-lg">check_circle</span>Registered`; btn.onclick = toggleRegister; }
+  else { btn.innerHTML = `<span class="material-symbols-rounded text-lg">how_to_reg</span>Register`; btn.onclick = toggleRegister; }
+}
+async function toggleRegister() {
+  if (!SITE.user) { location.href = "login.html"; return; }
+  const ref = db.collection("events").doc(currentEvent.id).collection("registrations").doc(SITE.user.uid);
+  const doc = await ref.get();
+  if (doc.exists) { await ref.delete(); showToast("Registration cancelled"); }
+  else { await ref.set({ name: SITE.userDoc?.name || SITE.user.email, email: SITE.user.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); showToast("You are registered for this event!"); }
+  updateRegisterButton();
+}
+async function postComment() {
+  const input = document.getElementById("em-comment-input");
+  const text = input.value.trim();
+  if (!text) return;
+  if (!SITE.user) { showToast("Please login to comment", "error"); location.href = "login.html"; return; }
+  await db.collection("events").doc(currentEvent.id).collection("comments").add({
+    text, name: SITE.userDoc?.name || SITE.user.email, uid: SITE.user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+  input.value = "";
 }
 </script>
 </body>

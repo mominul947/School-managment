@@ -90,7 +90,7 @@ tailwind.config = {
   <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-16 md:h-20">
     <div class="flex items-center gap-3">
       <img id="site-logo" alt="Otarhat High School Logo" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-full bg-white p-0.5" src="https://cdn.phototourl.com/free/2026-06-30-ab1ec5e9-69b4-47b3-8bf9-2d6f233e42a5.jpg"/>
-      <span id="site-name" class="font-headline text-lg md:text-2xl font-bold text-on-primary whitespace-nowrap">Otarhat High School</span>
+      <span id="site-name" class="font-headline text-lg md:text-2xl font-bold text-on-primary whitespace-nowrap">Ex-student Association OTS</span>
     </div>
     <div class="flex items-center gap-2">
       <button class="hidden md:inline-block text-on-primary px-4 py-2 border border-on-primary/40 rounded font-bold hover:bg-white/10 transition" type="button">Login</button>
@@ -110,36 +110,32 @@ tailwind.config = {
     <button class="text-on-primary" id="drawer-close" type="button"><span class="material-symbols-outlined text-3xl">close</span></button>
   </div>
   <nav class="flex flex-col gap-1 overflow-y-auto pr-1">
-    <a class="text-on-primary font-bold border-l-4 border-secondary-fixed pl-4 py-2 flex items-center gap-2" href="#home">
+    <a class="text-on-primary font-bold border-l-4 border-secondary-fixed pl-4 py-2 flex items-center gap-2" href="index.html">
       <span class="material-symbols-outlined text-xl">home</span> Home
     </a>
     <div class="h-px bg-on-primary-container/20 my-3"></div>
-<button class="drawer-acc text-on-primary-container hover:text-on-primary pl-4 pr-2 py-2 flex justify-between items-center w-full font-bold">
+
+    <!-- About Section -->
+    <button class="drawer-acc text-on-primary-container hover:text-on-primary pl-4 pr-2 py-2 flex justify-between items-center w-full font-bold">
       <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">menu_book</span> About</span>
       <span class="material-symbols-outlined transition-transform">expand_more</span>
     </button>
     <div class="drawer-acc-panel hidden flex flex-col gap-1 pl-10 pb-2">
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="about.html">Our Story</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="headmaster.html">Headmasters</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="mission.html">Mission &amp; Vision</a>
+      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="about.html">About Us</a>
+      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="ourstory.html">Our Story</a>
+      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="headmaster.html">Former Teachers & Staff</a>
       <a class="text-on-primary-container hover:text-on-primary py-1.5" href="executive.html">Executive Committee</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="exstudent.html">EX Student</a>
+      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="exstudent.html">Ex-Students</a>
     </div>
     <div class="h-px bg-on-primary-container/20 my-3"></div>
 
-    <button class="drawer-acc text-on-primary-container hover:text-on-primary pl-4 pr-2 py-2 flex justify-between items-center w-full font-bold">
-      <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">groups</span> Membership</span>
-      <span class="material-symbols-outlined transition-transform">expand_more</span>
-    </button>
-    <div class="drawer-acc-panel hidden flex flex-col gap-1 pl-10 pb-2">
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Join</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Membership Status</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Reinstatement Request</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Member Login</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Chapters</a>
-    </div>
+    <!-- Membership -->
+    <a class="text-on-primary-container hover:text-on-primary font-bold pl-4 py-2 flex items-center gap-2" href="membership.html">
+      <span class="material-symbols-outlined text-xl">groups</span> Membership
+    </a>
     <div class="h-px bg-on-primary-container/20 my-3"></div>
 
+    <!-- Activities -->
     <button class="drawer-acc text-on-primary-container hover:text-on-primary pl-4 pr-2 py-2 flex justify-between items-center w-full font-bold">
       <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">target</span> Activities</span>
       <span class="material-symbols-outlined transition-transform">expand_more</span>
@@ -147,44 +143,19 @@ tailwind.config = {
     <div class="drawer-acc-panel hidden flex flex-col gap-1 pl-10 pb-2">
       <a class="text-on-primary-container hover:text-on-primary py-1.5" href="event.html">Events</a>
       <a class="text-on-primary-container hover:text-on-primary py-1.5" href="notice.html">Notice Board</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Community &amp; Joy</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">e-Magazine</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="executive.html">Executive Council</a>
+      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="gallery.html">Gallery</a>
     </div>
     <div class="h-px bg-on-primary-container/20 my-3"></div>
 
-    <button class="drawer-acc text-on-primary-container hover:text-on-primary pl-4 pr-2 py-2 flex justify-between items-center w-full font-bold">
-      <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">work</span> Career</span>
-      <span class="material-symbols-outlined transition-transform">expand_more</span>
-    </button>
-    <div class="drawer-acc-panel hidden flex flex-col gap-1 pl-10 pb-2">
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Jobs</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Resume Bank</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Mentorship</a>
-    </div>
-    <div class="h-px bg-on-primary-container/20 my-3"></div>
-
-    <button class="drawer-acc text-on-primary-container hover:text-on-primary pl-4 pr-2 py-2 flex justify-between items-center w-full font-bold">
-      <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">menu_book</span> Resources</span>
-      <span class="material-symbols-outlined transition-transform">expand_more</span>
-    </button>
-    <div class="drawer-acc-panel hidden flex flex-col gap-1 pl-10 pb-2">
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Blog</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Published Articles</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Terms &amp; Conditions</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Privacy Policy</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="index.html#contact">Contact Us</a>
-      <a class="text-on-primary-container hover:text-on-primary py-1.5" href="#">Powered By</a>
-    </div>
-    <div class="h-px bg-on-primary-container/20 my-3"></div>
-
-    <a class="text-secondary-fixed font-bold pl-4 py-2 flex items-center gap-2" href="#">
-      <span class="material-symbols-outlined text-xl">favorite</span> Donate
+    <!-- Contact -->
+    <a class="text-on-primary-container hover:text-on-primary font-bold pl-4 py-2 flex items-center gap-2" href="contact.html">
+      <span class="material-symbols-outlined text-xl">call</span> Contact Us
     </a>
   </nav>
+
   <div class="mt-4 flex flex-col gap-3 pt-6 border-t border-on-primary-container/20">
-    <button class="w-full py-3 bg-secondary-fixed text-primary font-bold rounded hover:bg-secondary-fixed-dim transition">Join OLSA</button>
-    <button class="w-full py-3 border border-on-primary text-on-primary font-bold rounded hover:bg-on-primary hover:text-primary transition">Login</button>
+    <a href="membership.html" class="w-full text-center py-3 bg-secondary-fixed text-primary font-bold rounded hover:bg-secondary-fixed-dim transition">Join Now</a>
+    <a href="login.html" class="w-full text-center py-3 border border-on-primary text-on-primary font-bold rounded hover:bg-on-primary hover:text-primary transition">Login</a>
   </div>
 </div>
 
@@ -442,12 +413,13 @@ Otarhat High School Ex-Student Association brings together generations of alumni
    5) Create one admin user under Authentication -> Users -> Add user.
    ===================================================================== */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBHYYbAxbQVv9nL1r6b_anOa52r7_rOzEk",
+  authDomain: "school-mangament.firebaseapp.com",
+  projectId: "school-mangament",
+  storageBucket: "school-mangament.firebasestorage.app",
+  messagingSenderId: "593087054757",
+  appId: "1:593087054757:web:a946aa37387c2a91a11e4c",
+  measurementId: "G-PFV5MWK503"
 };
 
 let db = null, auth = null, firebaseReady = false;
