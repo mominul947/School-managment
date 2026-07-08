@@ -1,191 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Profile | Ex-Student Association Otarhat High School</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
-<link rel="stylesheet" href="assets/style.css">
-<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
-.tab.active{border-color:var(--accent); color:var(--accent);}
-</style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<script src="assets/firebase-config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Ex-Student Association</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHYYbAxbQVv9nL1r6b_anOa52r7_rOzEk",
+            authDomain: "school-mangament.firebaseapp.com",
+            projectId: "school-mangament",
+            storageBucket: "school-mangament.firebasestorage.app",
+            messagingSenderId: "593087054757",
+            appId: "1:593087054757:web:a946aa37387c2a91a11e4c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
 </head>
-<body class="pb-16 lg:pb-0">
-<div id="site-header"></div>
+<body class="bg-slate-50">
 
-<section class="pt-32 pb-8 bg-brand text-center">
-  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">My Profile</h1>
-</section>
+<div class="max-w-4xl mx-auto p-6 py-12">
+    <!-- প্রোফাইল কার্ড -->
+    <div id="profile-container" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+        <h2 class="text-2xl font-bold mb-6 text-[#0E2144]">My Profile</h2>
+        
+        <div id="user-info" class="space-y-4">
+            <!-- তথ্য এখানে লোড হবে -->
+            <p class="text-slate-500">Loading your profile...</p>
+        </div>
 
-<div id="login-required" class="hidden max-w-md mx-auto px-4 py-20 empty-state">
-  <span class="material-symbols-rounded text-5xl mb-3 opacity-40">lock</span>
-  <p class="mb-4">Please login to view your profile.</p>
-  <a href="login.html" class="btn-grad px-6 py-2.5 rounded-xl font-bold text-sm">Login</a>
+        <div class="mt-8 pt-6 border-t">
+            <button onclick="auth.signOut().then(() => window.location.href='login.html')" 
+                    class="bg-red-50 text-red-600 px-6 py-2 rounded-xl font-bold text-sm">Logout</button>
+        </div>
+    </div>
 </div>
 
-<main id="profile-app" class="hidden max-w-4xl mx-auto px-4 py-12">
-  <!-- ID CARD -->
-  <div class="id-card p-6 md:p-8 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-    <div class="md:col-span-2 relative z-10">
-      <p class="text-xs uppercase tracking-widest opacity-80">Ex-Student Association</p>
-      <p class="font-display font-extrabold text-2xl mb-4">Otarhat High School</p>
-      <div class="flex items-center gap-4 mb-4">
-        <img id="idc-photo" src="https://placehold.co/120x120?text=Photo" class="w-20 h-20 rounded-full object-cover border-2 border-white/50">
-        <div>
-          <p id="idc-name" class="font-bold text-xl"></p>
-          <p id="idc-batch" class="text-sm opacity-80"></p>
-          <p id="idc-status" class="text-xs mt-1 inline-block px-2 py-0.5 rounded-full bg-white/20"></p>
-        </div>
-      </div>
-      <p id="idc-number" class="text-xs opacity-70 font-mono"></p>
-      <button onclick="downloadIdCard()" class="mt-4 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-sm font-bold flex items-center gap-1.5"><span class="material-symbols-rounded text-lg">download</span>Download ID Card</button>
-    </div>
-    <div class="flex justify-center relative z-10">
-      <div id="idc-qr" class="bg-white p-2 rounded-xl"></div>
-    </div>
-  </div>
-
-  <!-- TABS -->
-  <div class="flex gap-4 border-b border-[var(--border)] mb-6 text-sm font-bold">
-    <button data-tab="details" class="tab active pb-3 border-b-2 border-transparent">Profile Details</button>
-    <button data-tab="edit" class="tab pb-3 border-b-2 border-transparent opacity-60">Edit Profile</button>
-    <button data-tab="security" class="tab pb-3 border-b-2 border-transparent opacity-60">Change Password</button>
-  </div>
-
-  <div id="tab-details" class="tab-panel surface card p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-5 text-sm"></div>
-
-  <div id="tab-edit" class="tab-panel hidden surface card p-6 md:p-8">
-    <div class="flex items-center gap-4 mb-5">
-      <img id="ef-photo-preview" class="w-16 h-16 rounded-full object-cover border">
-      <label class="text-sm font-semibold px-4 py-2 rounded-xl surface border border-[var(--border)] cursor-pointer">Change Photo<input type="file" id="ef-photo" accept="image/*" class="hidden"></label>
-    </div>
-    <form id="edit-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input id="ef-name" placeholder="Full Name" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input id="ef-phone" placeholder="Phone" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input id="ef-batch" placeholder="Batch" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input id="ef-occupation" placeholder="Occupation" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input id="ef-address" placeholder="Address" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent md:col-span-2">
-      <input id="ef-facebook" placeholder="Facebook URL" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input id="ef-linkedin" placeholder="LinkedIn URL" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <textarea id="ef-bio" rows="3" placeholder="Short Bio" class="px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent md:col-span-2"></textarea>
-      <button type="submit" class="btn-grad px-6 py-3 rounded-xl font-bold text-sm md:col-span-2">Save Changes</button>
-    </form>
-  </div>
-
-  <div id="tab-security" class="tab-panel hidden surface card p-6 md:p-8 max-w-md">
-    <form id="password-form" class="space-y-4">
-      <input required type="password" id="pf-current" placeholder="Current Password" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input required type="password" id="pf-new" placeholder="New Password" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <button type="submit" class="btn-grad px-6 py-3 rounded-xl font-bold text-sm">Update Password</button>
-    </form>
-  </div>
-</main>
-
-<div id="site-footer"></div>
-<script src="assets/site.js"></script>
 <script>
-bootSite("profile.html");
-let profilePhotoDataUrl = null;
+    // ইউজার লগইন চেক করা
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = "login.html"; // লগইন না থাকলে রিডাইরেক্ট
+            return;
+        }
 
-document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
-  document.querySelectorAll(".tab").forEach((x) => { x.classList.remove("active"); x.classList.add("opacity-60"); });
-  t.classList.add("active"); t.classList.remove("opacity-60");
-  document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
-  document.getElementById("tab-" + t.dataset.tab).classList.remove("hidden");
-}));
+        // Firestore থেকে ইউজার ডাটা আনা
+        try {
+            const doc = await db.collection("users").doc(user.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+                renderProfile(data, user.email);
+            }
+        } catch (e) {
+            console.error("Error fetching profile:", e);
+        }
+    });
 
-document.addEventListener("auth-ready", (e) => {
-  const data = e.detail;
-  if (!SITE.user) { document.getElementById("login-required").classList.remove("hidden"); document.getElementById("profile-app").classList.add("hidden"); return; }
-  document.getElementById("login-required").classList.add("hidden");
-  document.getElementById("profile-app").classList.remove("hidden");
-  renderProfile(data || {});
-});
-
-function renderProfile(d) {
-  const cardNumber = `OHSA-${SITE.user.uid.slice(0, 4).toUpperCase()}-${SITE.user.uid.slice(-4).toUpperCase()}`;
-  document.getElementById("idc-photo").src = d.photo || "https://placehold.co/120x120?text=Photo";
-  document.getElementById("idc-name").textContent = d.name || SITE.user.email;
-  document.getElementById("idc-batch").textContent = d.batch ? "Batch " + d.batch : "";
-  document.getElementById("idc-status").textContent = statusLabel(d.status);
-  document.getElementById("idc-number").textContent = "ID: " + cardNumber;
-
-  document.getElementById("idc-qr").innerHTML = "";
-  new QRCode(document.getElementById("idc-qr"), { text: `OHSA-MEMBER|${cardNumber}|${d.name || ""}`, width: 96, height: 96 });
-
-  document.getElementById("tab-details").innerHTML = [
-    ["Full Name", d.name], ["Email", SITE.user.email], ["Phone", d.phone], ["Batch", d.batch],
-    ["Occupation", d.occupation], ["Address", d.address], ["Bio", d.bio],
-    ["Membership Status", statusLabel(d.status)], ["Payment Status", d.paymentStatus || "N/A"],
-  ].map(([label, val]) => `<div><p class="text-xs uppercase tracking-wide opacity-50 mb-1">${label}</p><p class="font-semibold">${escapeHtml(val || "-")}</p></div>`).join("");
-
-  document.getElementById("ef-photo-preview").src = d.photo || "https://placehold.co/100x100?text=Photo";
-  document.getElementById("ef-name").value = d.name || "";
-  document.getElementById("ef-phone").value = d.phone || "";
-  document.getElementById("ef-batch").value = d.batch || "";
-  document.getElementById("ef-occupation").value = d.occupation || "";
-  document.getElementById("ef-address").value = d.address || "";
-  document.getElementById("ef-facebook").value = d.facebook || "";
-  document.getElementById("ef-linkedin").value = d.linkedin || "";
-  document.getElementById("ef-bio").value = d.bio || "";
-}
-
-document.getElementById("ef-photo").addEventListener("change", (e) => {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => { profilePhotoDataUrl = reader.result; document.getElementById("ef-photo-preview").src = reader.result; };
-  reader.readAsDataURL(file);
-});
-
-document.getElementById("edit-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const payload = {
-    name: document.getElementById("ef-name").value,
-    phone: document.getElementById("ef-phone").value,
-    batch: document.getElementById("ef-batch").value,
-    occupation: document.getElementById("ef-occupation").value,
-    address: document.getElementById("ef-address").value,
-    facebook: document.getElementById("ef-facebook").value,
-    linkedin: document.getElementById("ef-linkedin").value,
-    bio: document.getElementById("ef-bio").value,
-  };
-  if (profilePhotoDataUrl) payload.photo = profilePhotoDataUrl;
-  try {
-    await db.collection("users").doc(SITE.user.uid).set(payload, { merge: true });
-    showToast("Profile updated successfully");
-    const doc = await db.collection("users").doc(SITE.user.uid).get();
-    renderProfile(doc.data());
-  } catch (err) { showToast("Update failed: " + err.message, "error"); }
-});
-
-document.getElementById("password-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const cur = document.getElementById("pf-current").value, nw = document.getElementById("pf-new").value;
-  try {
-    const cred = firebase.auth.EmailAuthProvider.credential(SITE.user.email, cur);
-    await SITE.user.reauthenticateWithCredential(cred);
-    await SITE.user.updatePassword(nw);
-    showToast("Password updated successfully");
-    e.target.reset();
-  } catch (err) { showToast("Failed: " + err.message, "error"); }
-});
-
-function downloadIdCard() {
-  const cardHtml = document.querySelector(".id-card").outerHTML;
-  const w = window.open("", "_blank");
-  w.document.write(`<html><head><title>Membership ID Card</title><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="assets/style.css"></head><body style="display:flex;justify-content:center;padding:40px;">${cardHtml}</body></html>`);
-  w.document.close();
-  setTimeout(() => w.print(), 500);
-}
+    // ডাটা স্ক্রিনে দেখানো
+    function renderProfile(d, email) {
+        const container = document.getElementById("user-info");
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-xs text-slate-400 font-bold uppercase">Full Name</label>
+                    <p class="font-semibold text-lg">${d.name || 'N/A'}</p>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-bold uppercase">Email</label>
+                    <p class="font-semibold text-lg">${email}</p>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-bold uppercase">Phone</label>
+                    <p class="font-semibold text-lg">${d.phone || 'N/A'}</p>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-bold uppercase">Batch</label>
+                    <p class="font-semibold text-lg">${d.batch || 'N/A'}</p>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-bold uppercase">Status</label>
+                    <p class="font-semibold text-lg capitalize text-blue-600">${d.status || 'Pending'}</p>
+                </div>
+            </div>
+        `;
+    }
 </script>
+
 </body>
 </html>

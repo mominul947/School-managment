@@ -1,51 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mission & Vision | Ex-Student Association Otarhat High School</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
-<link rel="stylesheet" href="assets/style.css">
-<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/firebase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission & Vision | Ex-Student Association</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHYYbAxbQVv9nL1r6b_anOa52r7_rOzEk",
+            authDomain: "school-mangament.firebaseapp.com",
+            projectId: "school-mangament",
+            storageBucket: "school-mangament.firebasestorage.app",
+            messagingSenderId: "593087054757",
+            appId: "1:593087054757:web:a946aa37387c2a91a11e4c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
-<body class="pb-16 lg:pb-0">
-<div id="site-header"></div>
+<body class="bg-slate-50 text-slate-800">
 
-<section class="pt-32 pb-10 bg-brand text-center">
-  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">What Drives Us</p>
-  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Mission & Vision</h1>
+<!-- Header -->
+<section class="bg-[#0E2144] py-20 px-4 text-center">
+    <p class="text-[#C8A951] font-bold text-xs uppercase tracking-widest mb-2">What Drives Us</p>
+    <h1 class="text-4xl font-extrabold text-white">Mission & Vision</h1>
 </section>
 
-<main class="max-w-5xl mx-auto px-4 py-14 grid grid-cols-1 md:grid-cols-2 gap-6" id="mv-grid">
-  <div class="surface card p-8">
-    <span class="material-symbols-rounded text-4xl text-accent mb-4">rocket_launch</span>
-    <h2 class="font-display font-extrabold text-xl mb-3">Our Mission</h2>
-    <div id="mission-text" class="text-[15px] leading-relaxed opacity-80 space-y-3"><div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-4/5"></div></div>
-  </div>
-  <div class="surface card p-8">
-    <span class="material-symbols-rounded text-4xl text-gold mb-4">visibility</span>
-    <h2 class="font-display font-extrabold text-xl mb-3">Our Vision</h2>
-    <div id="vision-text" class="text-[15px] leading-relaxed opacity-80 space-y-3"><div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-4/5"></div></div>
-  </div>
+<!-- Content -->
+<main class="max-w-5xl mx-auto px-4 py-14 grid grid-cols-1 md:grid-cols-2 gap-8">
+    
+    <!-- Mission Card -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+        <span class="material-symbols-rounded text-4xl text-[#2F6FED] mb-4">rocket_launch</span>
+        <h2 class="font-bold text-xl mb-4 text-[#0E2144]">Our Mission</h2>
+        <div id="mission-text" class="text-slate-600 leading-relaxed space-y-3">
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Vision Card -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+        <span class="material-symbols-rounded text-4xl text-[#C8A951] mb-4">visibility</span>
+        <h2 class="font-bold text-xl mb-4 text-[#0E2144]">Our Vision</h2>
+        <div id="vision-text" class="text-slate-600 leading-relaxed space-y-3">
+            <p>Loading...</p>
+        </div>
+    </div>
+
 </main>
 
-<div id="site-footer"></div>
-<script src="assets/site.js"></script>
 <script>
-bootSite("mission.html");
-db.collection("siteContent").doc("missionVision").onSnapshot((doc) => {
-  const m = document.getElementById("mission-text"), v = document.getElementById("vision-text");
-  const d = doc.exists ? doc.data() : {};
-  m.innerHTML = (d.mission || "").split("\n").filter((l) => l.trim()).map((l) => `<p>${escapeHtml(l)}</p>`).join("") || `<div class="empty-state">No mission text added yet.</div>`;
-  v.innerHTML = (d.vision || "").split("\n").filter((l) => l.trim()).map((l) => `<p>${escapeHtml(l)}</p>`).join("") || `<div class="empty-state">No vision text added yet.</div>`;
-}, () => {});
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Firebase থেকে ডেটা ফেচ করা
+    db.collection("siteContent").doc("missionVision").onSnapshot((doc) => {
+        const mEl = document.getElementById("mission-text");
+        const vEl = document.getElementById("vision-text");
+        
+        if (doc.exists) {
+            const data = doc.data();
+            
+            // মিশন টেক্সট রেন্ডার
+            mEl.innerHTML = data.mission 
+                ? data.mission.split("\n").map(l => `<p>${escapeHtml(l)}</p>`).join("") 
+                : '<p>No mission content added yet.</p>';
+                
+            // ভিশন টেক্সট রেন্ডার
+            vEl.innerHTML = data.vision 
+                ? data.vision.split("\n").map(l => `<p>${escapeHtml(l)}</p>`).join("") 
+                : '<p>No vision content added yet.</p>';
+        } else {
+            mEl.innerHTML = '<p>Content not found.</p>';
+            vEl.innerHTML = '<p>Content not found.</p>';
+        }
+    }, (error) => {
+        console.error("Error loading content:", error);
+    });
 </script>
 </body>
 </html>

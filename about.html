@@ -1,49 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About | Ex-Student Association Otarhat High School</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
-<link rel="stylesheet" href="assets/style.css">
-<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/firebase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Ex-Student Association Otarhat High School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // আপনার Firebase কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHYYbAxbQVv9nL1r6b_anOa52r7_rOzEk",
+            authDomain: "school-mangament.firebaseapp.com",
+            projectId: "school-mangament",
+            storageBucket: "school-mangament.firebasestorage.app",
+            messagingSenderId: "593087054757",
+            appId: "1:593087054757:web:a946aa37387c2a91a11e4c"
+        };
+        // ইনিশিয়ালাইজেশন
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
-<body class="pb-16 lg:pb-0">
-<div id="site-header"></div>
+<body class="bg-slate-50 text-slate-800">
 
-<section class="pt-32 pb-10 bg-brand text-center">
-  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Who We Are</p>
-  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">About the Association</h1>
+<!-- Header -->
+<section class="bg-[#0E2144] py-20 px-4 text-center">
+    <span class="text-[#C8A951] font-bold text-sm tracking-[0.2em] uppercase">Who We Are</span>
+    <h1 class="text-4xl md:text-5xl font-extrabold text-white mt-3">About the Association</h1>
 </section>
 
-<main class="max-w-4xl mx-auto px-4 py-14">
-  <div class="surface card p-6 md:p-10">
-    <img id="about-image" class="w-full h-64 md:h-80 object-cover rounded-2xl mb-8 hidden">
-    <div id="about-content" class="prose max-w-none text-[15px] leading-relaxed opacity-90 space-y-4">
-      <div class="skeleton h-4 w-full mb-3"></div><div class="skeleton h-4 w-5/6 mb-3"></div><div class="skeleton h-4 w-2/3"></div>
+<!-- Content -->
+<main class="max-w-3xl mx-auto px-4 -mt-10 mb-16">
+    <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100">
+        <img id="about-image" class="w-full h-64 md:h-96 object-cover rounded-2xl mb-8 hidden shadow-lg">
+        
+        <div id="about-content" class="text-lg leading-relaxed text-slate-600 space-y-6">
+            <div class="animate-pulse space-y-4">
+                <div class="h-4 bg-slate-200 rounded w-full"></div>
+                <div class="h-4 bg-slate-200 rounded w-5/6"></div>
+                <div class="h-4 bg-slate-200 rounded w-2/3"></div>
+            </div>
+        </div>
     </div>
-  </div>
 </main>
 
-<div id="site-footer"></div>
-<script src="assets/site.js"></script>
 <script>
-bootSite("about.html");
-db.collection("siteContent").doc("about").onSnapshot((doc) => {
-  const box = document.getElementById("about-content");
-  const img = document.getElementById("about-image");
-  if (!doc.exists) { box.innerHTML = `<div class="empty-state"><span class="material-symbols-rounded text-4xl mb-2 opacity-40">info</span>No content has been added to the About page yet.</div>`; return; }
-  const d = doc.data();
-  if (d.image) { img.src = d.image; img.classList.remove("hidden"); }
-  box.innerHTML = (d.content || "").split("\n").filter((l) => l.trim()).map((l) => `<p>${escapeHtml(l)}</p>`).join("") || `<div class="empty-state">No content added yet.</div>`;
-}, () => { document.getElementById("about-content").innerHTML = `<div class="empty-state">Could not load content.</div>`; });
+    // ডাটা লোড ফাংশন
+    db.collection("siteContent").doc("about").onSnapshot((doc) => {
+        const box = document.getElementById("about-content");
+        const img = document.getElementById("about-image");
+        
+        if (!doc.exists) {
+            box.innerHTML = `<p class="text-center text-slate-400">No content available.</p>`;
+            return;
+        }
+
+        const d = doc.data();
+
+        // ইমেজ আপডেট
+        if (d.image && d.image.trim() !== "") {
+            img.src = d.image;
+            img.classList.remove("hidden");
+        } else {
+            img.classList.add("hidden");
+        }
+
+        // কন্টেন্ট আপডেট
+        if (d.content && d.content.trim() !== "") {
+            box.innerHTML = d.content.split("\n")
+                .filter(l => l.trim())
+                .map(l => `<p class="text-slate-700">${l}</p>`)
+                .join("");
+        } else {
+            box.innerHTML = `<p class="text-slate-500">No description added yet.</p>`;
+        }
+    }, (err) => {
+        console.error("Error loading data: ", err);
+        document.getElementById("about-content").innerHTML = `<p class="text-red-500">Could not load content.</p>`;
+    });
 </script>
+
 </body>
 </html>

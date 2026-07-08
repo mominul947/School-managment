@@ -433,9 +433,10 @@ try {
 }
 
 const CONTENT_DOC = () => db.collection("siteContent").doc("home");
+const SETTINGS_DOC = () => db.collection("siteSettings").doc("main");
 
 const DEFAULT_CONTENT = {
-  siteName: "Otarhat High School",
+  siteName: "Ex-student Association OTS",
   logoUrl: "https://cdn.phototourl.com/free/2026-06-30-ab1ec5e9-69b4-47b3-8bf9-2d6f233e42a5.jpg",
   heroVideoUrl: "",
   heroImageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuA3hmDOGW4xkWbbhQhw53YbbAZP43SdOcVlIpjzk_5NxArLyyXw63KeNjTMIXS_NJgW4VMopRP2Vyw7kudqtFDpHfBwHYu_FGO6SR18rKkLwSdTSw0ojYONB-quwjgVOK3AcAq8l6y9S6t3imU0rQSpf-WXescYu2T8KJrh9Q_GJuP40I_g5Z3mylg8Hu7-MoOu6tQ4blY4zHmf8QIRo1OSTWbaucQWfTctKCyRrgjR6aG2y_M4pnHeIBJa29vnBq7LZpMfXyIQKaym",
@@ -451,8 +452,30 @@ const DEFAULT_CONTENT = {
   footerAbout: "Connecting generations of alumni since 1959. Dedicated to professional growth, community welfare, and the spirit of Otarhat High School."
 };
 
-function applyContent(c) {
-  const data = Object.assign({}, DEFAULT_CONTENT, c || {});
+function applyContent(c, settings) {
+  // NOTE: The main Admin Panel (admin.html) saves the homepage hero using
+  // shorter field names (title / subtitle / heroImage / heroVideo) while
+  // this page historically expected longer names (heroTitle / heroSubtitle /
+  // heroImageUrl / heroVideoUrl). That mismatch is exactly why content
+  // added from the Admin Panel was not showing up here. We now accept
+  // BOTH, so it works no matter which admin screen was used to save it.
+  const raw = c || {};
+  const s = settings || {};
+  const normalized = {
+    heroTitle: raw.heroTitle ?? raw.title,
+    heroSubtitle: raw.heroSubtitle ?? raw.subtitle,
+    heroImageUrl: raw.heroImageUrl ?? raw.heroImage ?? s.heroImage,
+    heroVideoUrl: raw.heroVideoUrl ?? raw.heroVideo ?? s.heroVideo,
+    // Site branding (name/logo/footer text) is managed globally from the
+    // Admin Panel's "Site Settings" page (siteSettings/main). Fall back to
+    // this page's own siteContent/home fields, then to DEFAULT_CONTENT.
+    siteName: s.siteName ?? raw.siteName,
+    logoUrl: s.logo ?? raw.logoUrl,
+    footerAbout: s.footerText ?? raw.footerAbout,
+  };
+  Object.keys(normalized).forEach((k) => normalized[k] === undefined && delete normalized[k]);
+
+  const data = Object.assign({}, DEFAULT_CONTENT, raw, normalized);
   document.getElementById('site-logo').src = data.logoUrl;
   document.getElementById('footer-logo').src = data.logoUrl;
   document.getElementById('site-name').textContent = data.siteName;
@@ -547,12 +570,19 @@ function readAdminForm() {
 
 // Load + live-sync content from Firestore (falls back to defaults if not configured)
 if (firebaseReady) {
+  let _lastHomeData = null, _lastSettingsData = null;
+  const _rerender = () => applyContent(_lastHomeData || DEFAULT_CONTENT, _lastSettingsData || {});
   CONTENT_DOC().onSnapshot((doc) => {
-    applyContent(doc.exists ? doc.data() : DEFAULT_CONTENT);
+    _lastHomeData = doc.exists ? doc.data() : DEFAULT_CONTENT;
+    _rerender();
     if (doc.exists) fillAdminForm(doc.data());
-  }, (err) => { console.warn(err); applyContent(DEFAULT_CONTENT); });
+  }, (err) => { console.warn(err); _lastHomeData = DEFAULT_CONTENT; _rerender(); });
+  SETTINGS_DOC().onSnapshot((doc) => {
+    _lastSettingsData = doc.exists ? doc.data() : {};
+    _rerender();
+  }, (err) => { console.warn(err); });
 } else {
-  applyContent(DEFAULT_CONTENT);
+  applyContent(DEFAULT_CONTENT, {});
 }
 
 // ---------- Route: #admin shows admin panel, anything else shows site ----------

@@ -1,97 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact | Ex-Student Association Otarhat High School</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily:{sans:['Inter','sans-serif'],display:['Manrope','sans-serif']}, colors:{brand:'#0E2144',accent:'#2F6FED',gold:'#C8A951'} } } };</script>
-<link rel="stylesheet" href="assets/style.css">
-<style>.material-symbols-rounded{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/firebase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Ex-Student Association</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHYYbAxbQVv9nL1r6b_anOa52r7_rOzEk",
+            authDomain: "school-mangament.firebaseapp.com",
+            projectId: "school-mangament",
+            storageBucket: "school-mangament.firebasestorage.app",
+            messagingSenderId: "593087054757",
+            appId: "1:593087054757:web:a946aa37387c2a91a11e4c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
-<body class="pb-16 lg:pb-0">
-<div id="site-header"></div>
+<body class="bg-slate-50 text-slate-800">
 
-<section class="pt-32 pb-10 bg-brand text-center">
-  <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">We'd Love To Hear From You</p>
-  <h1 class="font-display font-extrabold text-3xl md:text-4xl text-white">Contact Us</h1>
+<!-- Header -->
+<section class="bg-[#0E2144] py-20 px-4 text-center">
+    <h1 class="text-4xl font-extrabold text-white">Contact Us</h1>
+    <p class="text-[#C8A951] mt-2">We'd love to hear from you</p>
 </section>
 
-<main class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-  <div class="surface card p-6 md:p-8">
-    <h2 class="font-display font-extrabold text-xl mb-5">Send a Message</h2>
-    <form id="contact-form" class="space-y-4">
-      <input required id="cf-name" placeholder="Your Name" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input required type="email" id="cf-email" placeholder="Your Email" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <input id="cf-phone" placeholder="Phone (optional)" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent">
-      <textarea required id="cf-message" rows="5" placeholder="Your Message" class="w-full px-4 py-3 rounded-xl surface border border-[var(--border)] text-sm outline-none focus:ring-2 focus:ring-accent"></textarea>
-      <button type="submit" id="cf-submit" class="w-full py-3 btn-grad rounded-xl font-bold text-sm">Send Message</button>
-    </form>
-  </div>
+<main class="max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    
+    <!-- Contact Form -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+        <h2 class="text-xl font-bold mb-6">Send a Message</h2>
+        <form id="contact-form" class="space-y-4">
+            <input id="cf-name" placeholder="Your Name" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-[#2F6FED]" required>
+            <input id="cf-email" type="email" placeholder="Your Email" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-[#2F6FED]" required>
+            <textarea id="cf-message" rows="4" placeholder="Your Message" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-[#2F6FED]" required></textarea>
+            <button type="submit" id="cf-submit" class="w-full py-3 bg-[#0E2144] text-white rounded-xl font-bold hover:bg-slate-900 transition">Send Message</button>
+        </form>
+    </div>
 
-  <div class="space-y-6">
-    <div class="surface card p-6 md:p-8" id="contact-info">
-      <h2 class="font-display font-extrabold text-xl mb-5">Get in Touch</h2>
-      <div class="space-y-4 text-sm" id="contact-details">
-        <div class="skeleton h-4 w-2/3"></div><div class="skeleton h-4 w-1/2"></div><div class="skeleton h-4 w-3/4"></div>
-      </div>
-      <div class="flex gap-2 mt-6" id="contact-social"></div>
+    <!-- Contact Info & Map -->
+    <div class="space-y-6">
+        <div id="contact-details" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+            <h2 class="text-xl font-bold mb-4">Office Information</h2>
+            <div id="info-content" class="space-y-4">
+                <p class="text-slate-400">Loading details...</p>
+            </div>
+        </div>
     </div>
-    <div class="rounded-2xl overflow-hidden card h-64" id="contact-map-wrap">
-      <iframe id="contact-map" class="w-full h-full border-0" loading="lazy"></iframe>
-    </div>
-  </div>
 </main>
 
-<div id="site-footer"></div>
-<script src="assets/site.js"></script>
 <script>
-bootSite("contact.html");
-
-db.collection("siteContent").doc("contact").onSnapshot((doc) => {
-  const d = doc.exists ? doc.data() : {};
-  document.getElementById("contact-details").innerHTML = `
-    ${d.address ? `<p class="flex items-start gap-3"><span class="material-symbols-rounded text-accent mt-0.5">location_on</span><span>${escapeHtml(d.address)}</span></p>` : ""}
-    ${d.phone ? `<p class="flex items-center gap-3"><span class="material-symbols-rounded text-accent">call</span><a href="tel:${escapeHtml(d.phone)}">${escapeHtml(d.phone)}</a></p>` : ""}
-    ${d.email ? `<p class="flex items-center gap-3"><span class="material-symbols-rounded text-accent">mail</span><a href="mailto:${escapeHtml(d.email)}">${escapeHtml(d.email)}</a></p>` : ""}
-    ${!d.address && !d.phone && !d.email ? `<div class="empty-state">Contact details will appear here soon.</div>` : ""}`;
-  const mapWrap = document.getElementById("contact-map-wrap");
-  if (d.mapUrl) { mapWrap.classList.remove("hidden"); document.getElementById("contact-map").src = d.mapUrl; } else mapWrap.classList.add("hidden");
-}, () => {});
-
-document.addEventListener("site-settings-ready", (e) => {
-  const d = e.detail || {};
-  const social = document.getElementById("contact-social");
-  social.innerHTML = "";
-  if (d.facebook) social.innerHTML += `<a href="${d.facebook}" target="_blank" class="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center hover:text-accent"><span class="material-symbols-rounded">thumb_up</span></a>`;
-  if (d.youtube) social.innerHTML += `<a href="${d.youtube}" target="_blank" class="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center hover:text-accent"><span class="material-symbols-rounded">smart_display</span></a>`;
-  if (d.whatsapp) social.innerHTML += `<a href="https://wa.me/${d.whatsapp}" target="_blank" class="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center hover:text-accent"><span class="material-symbols-rounded">chat</span></a>`;
-});
-
-document.getElementById("contact-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById("cf-submit");
-  btn.disabled = true; btn.textContent = "Sending...";
-  try {
-    await db.collection("contactMessages").add({
-      name: document.getElementById("cf-name").value,
-      email: document.getElementById("cf-email").value,
-      phone: document.getElementById("cf-phone").value,
-      message: document.getElementById("cf-message").value,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      status: "unread",
+    // ডাটা লোড
+    db.collection("siteContent").doc("contact").onSnapshot((doc) => {
+        const d = doc.exists ? doc.data() : {};
+        const container = document.getElementById("info-content");
+        
+        container.innerHTML = `
+            ${d.address ? `<div class="flex items-center gap-4"><span class="bg-blue-50 text-[#2F6FED] p-3 rounded-full material-symbols-rounded">location_on</span><span>${d.address}</span></div>` : ""}
+            ${d.phone ? `<div class="flex items-center gap-4"><span class="bg-blue-50 text-[#2F6FED] p-3 rounded-full material-symbols-rounded">call</span><a href="tel:${d.phone}">${d.phone}</a></div>` : ""}
+            ${d.email ? `<div class="flex items-center gap-4"><span class="bg-blue-50 text-[#2F6FED] p-3 rounded-full material-symbols-rounded">mail</span><a href="mailto:${d.email}">${d.email}</a></div>` : ""}
+            ${d.mapUrl ? `<a href="${d.mapUrl}" target="_blank" class="flex items-center gap-4 text-[#2F6FED] font-bold hover:underline mt-4"><span class="bg-blue-50 p-3 rounded-full material-symbols-rounded">map</span>View on Google Maps</a>` : ""}
+        `;
     });
-    showToast("Message sent! We'll get back to you soon.");
-    e.target.reset();
-  } catch (err) { showToast("Failed to send: " + err.message, "error"); }
-  btn.disabled = false; btn.textContent = "Send Message";
-});
+
+    // ফর্ম সাবমিশন
+    document.getElementById("contact-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("cf-submit");
+        btn.textContent = "Sending...";
+        
+        try {
+            await db.collection("contactMessages").add({
+                name: document.getElementById("cf-name").value,
+                email: document.getElementById("cf-email").value,
+                message: document.getElementById("cf-message").value,
+                createdAt: new Date()
+            });
+            alert("Message sent successfully!");
+            e.target.reset();
+        } catch (err) { alert("Failed to send."); }
+        btn.textContent = "Send Message";
+    });
 </script>
 </body>
 </html>
